@@ -25,14 +25,13 @@
 import os
 from setuptools import setup, find_packages
 
-version_py = os.path.join(os.path.dirname(__file__), 'version.py')
-version = open(version_py).read().strip().split('=')[-1].replace('"','').strip()
+version_py = 0.12
 print("Setup.py thinks the current brizzy version is {}".format(version))
 
 
 setup(name='brizzy',
       requires=['python (>3.0)'],
-      version=version,
+      version=version_py,
       description='Tools for plotting Oxford Nanopore and other long-read data.',
       # sorry for the ugly indent formatting. I had to do this for PyPi's sake.
       long_description="""
