@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3 
 
 # Brizzy - easy Ocean Optics spectra capture.
 # Copyright (c) 2016-2017 Darrin T. Schultz. All rights reserved.
@@ -25,7 +25,7 @@
 import os
 from setuptools import setup, find_packages
 
-version_py = os.path.join(os.path.dirname(__file__), 'brizzy', 'version.py')
+version_py = os.path.join(os.path.dirname(__file__), 'version.py')
 version = open(version_py).read().strip().split('=')[-1].replace('"','').strip()
 print("Setup.py thinks the current brizzy version is {}".format(version))
 
