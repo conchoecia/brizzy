@@ -1,1 +1,1 @@
-fromm brizzy.version import __version__
+from brizzy.version import __version__
