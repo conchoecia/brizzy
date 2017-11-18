@@ -25,9 +25,8 @@
 import os
 from setuptools import setup, find_packages
 
-version_py = 0.12
-print("Setup.py thinks the current brizzy version is {}".format(version))
-
+version_py = 0.13
+print("Setup.py thinks the current brizzy version is {}".format(version_py))
 
 setup(name='brizzy',
       requires=['python (>3.0)'],
@@ -56,7 +55,6 @@ setup(name='brizzy',
             'Intended Audience :: Science/Research'
           ],
       license='GPLv3',
-      provides=['brizzy'],
       packages=find_packages(),
       install_requires=[
           "matplotlib >= 2.0.2",
