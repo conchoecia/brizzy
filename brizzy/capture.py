@@ -20,18 +20,6 @@ plt.rcParams['text.latex.preamble'] = [
         r'\sisetup{detect-all}',    # force siunitx to use the fonts
         ]
 
-def parse_arguments():
-    """This method parses the arguments provided during command-line input
-    to control how the kmers are counted. Please see the documentation for help.
-    """
-
-    #using Kevin's idea here to make te docstring the help file
-    parser=argparse.ArgumentParser(description=__doc__,
-                                   formatter_class=argparse.RawDescriptionHelpFormatter)
-
-    args = parser.parse_args()
-    return args
-
 def exit_handler():
     print("You have closed the brizzy program.\nNow looking for spectra files.")
     filelist = []

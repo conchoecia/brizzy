@@ -24,10 +24,6 @@ import sys
 import os.path
 import argparse
 
-# logger
-import logging
-logger = logging.getLogger('brizzy')
-
 import brizzy.version
 # This class is used in argparse to expand the ~. This avoids errors caused on
 # some systems.
