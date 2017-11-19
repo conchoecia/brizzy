@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use('TkAgg')
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -10,15 +12,15 @@ import atexit
 import argparse
 import csv
 
-from matplotlib import rc
-rc('text', usetex=True)
-plt.rcParams['text.latex.preamble'] = [
-        r'\usepackage{tgheros}',    # helvetica font
-        r'\usepackage{sansmath}',   # math-font matching  helvetica
-        r'\sansmath'                # actually tell tex to use it!
-        r'\usepackage{siunitx}',    # micro symbols
-        r'\sisetup{detect-all}',    # force siunitx to use the fonts
-        ]
+#from matplotlib import rc
+#rc('text', usetex=True)
+#plt.rcParams['text.latex.preamble'] = [
+#        r'\usepackage{tgheros}',    # helvetica font
+#        r'\usepackage{sansmath}',   # math-font matching  helvetica
+#        r'\sansmath'                # actually tell tex to use it!
+#        r'\usepackage{siunitx}',    # micro symbols
+#        r'\sisetup{detect-all}',    # force siunitx to use the fonts
+#        ]
 
 def exit_handler():
     print("You have closed the brizzy program.\nNow looking for spectra files.")
@@ -70,7 +72,7 @@ def plot_spectrum(x, y, index, yhat=False):
 def animate(frameno, inttime, monitor):
     devices = sb.list_devices()
     spec = sb.Spectrometer(devices[0])
-    spec.integration_time_micros(1000000)
+    spec.integration_time_micros(inttime)
     x = spec.wavelengths()
     y = spec.intensities()
     line.set_ydata(y)  # update the data
@@ -110,6 +112,6 @@ def run(args):
 
     ani = animation.FuncAnimation(fig, animate, blit=False,
                                   interval=args.integration_time,
-                                  fargs = [args.integration_time, args.monitor],
+                                  fargs = [int(args.integration_time*1000), args.monitor],
                                   repeat=True)
     plt.show()
