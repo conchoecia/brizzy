@@ -80,11 +80,12 @@ def animate(frameno, inttime, monitor):
     spec.close()
     if not monitor:
         a = np.column_stack([x,y])
+	# in np.savetext, using inttime/1000 since the USB2000 uses microseconds, not milliseconds.
         np.savetxt("spectrum_data_{}.csv".format(frameno),
                    a, delimiter = ',',
                    header = "wavelength,intensity",
                    fmt = '%.14f',
-                   comments="#integration time: {0} ms\n#{0}\n".format(inttime))
+                   comments="#integration time: {0} ms\n#{0}\n".format(inttime/1000))
     return line,
 
 def run(args):
