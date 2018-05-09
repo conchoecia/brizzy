@@ -12,16 +12,6 @@ import atexit
 import argparse
 import csv
 
-#from matplotlib import rc
-#rc('text', usetex=True)
-#plt.rcParams['text.latex.preamble'] = [
-#        r'\usepackage{tgheros}',    # helvetica font
-#        r'\usepackage{sansmath}',   # math-font matching  helvetica
-#        r'\sansmath'                # actually tell tex to use it!
-#        r'\usepackage{siunitx}',    # micro symbols
-#        r'\sisetup{detect-all}',    # force siunitx to use the fonts
-#        ]
-
 def exit_handler():
     print("You have closed the brizzy program.\nNow looking for spectra files.")
     filelist = []
@@ -69,7 +59,7 @@ def plot_spectrum(x, y, index, yhat=False):
     panel0.set_title("Spectrum lambda max = {}".format(int(lambdamax)))
     plt.savefig("spectrum_data_{}.png".format(index), dpi=300)
 
-def animate(frameno, inttime, monitor):
+def animate(frameno, inttime, monitor, prefix):
     devices = sb.list_devices()
     spec = sb.Spectrometer(devices[0])
     spec.integration_time_micros(inttime)
@@ -80,8 +70,12 @@ def animate(frameno, inttime, monitor):
     spec.close()
     if not monitor:
         a = np.column_stack([x,y])
-	# in np.savetext, using inttime/1000 since the USB2000 uses microseconds, not milliseconds.
-        np.savetxt("spectrum_data_{}.csv".format(frameno),
+        #in np.savetext, using inttime/1000 since the USB2000 uses microseconds, not milliseconds. 
+        if prefix:
+            filepref = prefix
+        else:
+            filepref = "spectrum_data"
+        np.savetxt("{}_{}.csv".format(filepref, frameno),
                    a, delimiter = ',',
                    header = "wavelength,intensity",
                    fmt = '%.14f',
@@ -110,6 +104,11 @@ def run(args):
     line, = ax.plot(x, y, lw=1, alpha=0.5)
     ax.set_xlim([min(x), max(x)])
     ax.set_ylim([min(y[10:]), max(y)*1.1])
+
+    if args.prefix:
+        prefix = None
+    else:
+        prefix = args.prefix
 
     ani = animation.FuncAnimation(fig, animate, blit=False,
                                   interval=args.integration_time,
