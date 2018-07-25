@@ -25,7 +25,7 @@
 import os
 from setuptools import setup, find_packages
 
-version_py = 0.14
+version_py = 0.19
 print("Setup.py thinks the current brizzy version is {}".format(version_py))
 
 setup(name='brizzy',
