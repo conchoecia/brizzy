@@ -84,6 +84,7 @@ def animate(frameno, inttime, monitor, prefix):
 
 def run(args):
     # Change the directory if it is specified by the user
+    print(args)
     if args.directory:
         if not os.path.exists(args.directory):
             os.makedirs(args.directory)
@@ -94,6 +95,9 @@ def run(args):
     global ax
     fig, ax = plt.subplots()
     devices = sb.list_devices()
+    if len(devices) == 0:
+        raise IOError("""No Ocean Optics devices found. Try a combination
+        of unplugging things and plugging them in again.""")
     print("Found this device: {}".format(devices[0]))
     spec = sb.Spectrometer(devices[0])
     spec.integration_time_micros(int(args.integration_time * 1000))
@@ -105,13 +109,15 @@ def run(args):
     ax.set_xlim([min(x), max(x)])
     ax.set_ylim([min(y[10:]), max(y)*1.1])
 
-    if args.prefix:
-        prefix = None
-    else:
+    if args.prefix is not None:
         prefix = args.prefix
+    else:
+        prefix = None
 
     ani = animation.FuncAnimation(fig, animate, blit=False,
                                   interval=args.integration_time,
-                                  fargs = [int(args.integration_time*1000), args.monitor],
+                                  fargs = [int(args.integration_time*1000),
+                                           args.monitor,
+                                           prefix],
                                   repeat=True)
     plt.show()
