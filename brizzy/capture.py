@@ -5,6 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import seabreeze.spectrometers as sb
+import seabreeze
 from scipy import signal
 import progressbar
 import os
@@ -24,9 +25,9 @@ def exit_handler():
         df = pd.read_csv(filelist[i], comment = '#')
         x = df['wavelength']
         y = df['intensity']
-        plot_spectrum(x, y, i, yhat=True)
+        plot_spectrum(x, y, filelist[i], yhat=True)
 
-def plot_spectrum(x, y, index, yhat=False):
+def plot_spectrum(x, y, filename, yhat=False):
     figWidth = 5
     figHeight = 4
     fig = plt.figure(figsize=(figWidth,figHeight))
@@ -45,23 +46,44 @@ def plot_spectrum(x, y, index, yhat=False):
                        left='off', labelleft='off', \
                        right='off', labelright='off',\
                        top='off', labeltop='off')
-    panel0.spines['top'].set_visible(False)
-    panel0.spines['right'].set_visible(False)
-    panel0.spines['left'].set_visible(False)
-    panel0.set_xlim([min(x), max(x)])
-    panel0.set_ylim([min(y[1:]), max(y)*1.1])
+    #panel0.spines['top'].set_visible(False)
+    #panel0.spines['right'].set_visible(False)
+    #panel0.spines['left'].set_visible(False)
     panel0.set_xlabel("wavelength")
+
+    mindone = False
+    maxdone = False
+    index_x_gt350 = -1
+    index_x_gt730 = -1
+    for i in range(len(x)):
+        if x[i] >= 375 and not mindone:
+            index_x_gt350 = i
+            mindone = True
+        if x[i] >= 730 and not maxdone:
+            index_x_gt730 = i
+            maxdone = True
+
+    yhat = signal.savgol_filter(y[index_x_gt350: index_x_gt730], 31, 3) # window size 51, polynomial order 3
     panel0.plot(x,y, lw=0.50, alpha = 0.4 )
-    yhat = signal.savgol_filter(y, 31, 3) # window size 51, polynomial order 3
-    panel0.plot(x,yhat, color='red', alpha = 0.5)
-    lambdamax = x[list(yhat).index(max(yhat))]
+    panel0.plot(x[index_x_gt350: index_x_gt730],yhat, color='red', alpha = 0.5)
+    newx = list(x[index_x_gt350: index_x_gt730])
+    lambdamax = newx[list(yhat).index(max(yhat))]
     panel0.axvline(x=lambdamax, color='black', lw=1.0)
     panel0.set_title("Spectrum lambda max = {}".format(int(lambdamax)))
-    plt.savefig("spectrum_data_{}.png".format(index), dpi=300)
+
+    panel0.set_xlim([min(x[index_x_gt350: index_x_gt730]),
+                     max(x[index_x_gt350: index_x_gt730])])
+    panel0.set_ylim([min(y[index_x_gt350: index_x_gt730]),
+                     max(yhat)*1.05])
+
+
+    plt.savefig("{}.png".format(filename), dpi=300)
+    plt.close()
 
 def animate(frameno, inttime, monitor, prefix):
     devices = sb.list_devices()
     spec = sb.Spectrometer(devices[0])
+
     spec.integration_time_micros(inttime)
     x = spec.wavelengths()
     y = spec.intensities()
@@ -100,7 +122,11 @@ def run(args):
         of unplugging things and plugging them in again.""")
     print("Found this device: {}".format(devices[0]))
     spec = sb.Spectrometer(devices[0])
+    spec.tec_set_enable(True)
+    spec.tec_set_temperature_C(4)
+
     spec.integration_time_micros(int(args.integration_time * 1000))
+
     x = spec.wavelengths()
     y = spec.intensities()
     spec.close()
