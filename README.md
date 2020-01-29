@@ -28,7 +28,7 @@ compared to other spectrum capture software.
 
 ### Installation
 
-To install this software, you will to install software. Right now it
+Brizzy has a few software dependencies. Right now it
 is easiest if you install Anaconda, install some dependencies with
 `conda`, then install `brizzy` using `pip`.
 
