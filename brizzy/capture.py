@@ -83,7 +83,7 @@ def plot_spectrum(x, y, filename, yhat=False):
 def animate(frameno, inttime, monitor, prefix):
     devices = sb.list_devices()
     spec = sb.Spectrometer(devices[0])
-
+    spec_model = spec._dev._model
     spec.integration_time_micros(inttime)
     x = spec.wavelengths()
     y = spec.intensities()
@@ -101,7 +101,7 @@ def animate(frameno, inttime, monitor, prefix):
                    a, delimiter = ',',
                    header = "wavelength,intensity",
                    fmt = '%.14f',
-                   comments="#integration time: {0} ms\n#{0}\n".format(inttime/1000))
+                   comments="#model: {0}\n#integration time: {1} ms\n".format( spec_model, inttime/1000) )
     return line,
 
 def run(args):
@@ -122,8 +122,14 @@ def run(args):
         of unplugging things and plugging them in again.""")
     print("Found this device: {}".format(devices[0]))
     spec = sb.Spectrometer(devices[0])
-    spec.tec_set_enable(True)
-    spec.tec_set_temperature_C(4)
+
+    target_temp = 4
+    try: # this will not work on all models of Ocean Optics spectrophotometers
+        spec.tec_set_enable(True)
+        spec.tec_set_temperature_C(target_temp)
+        print("Setting temperature to {}C".format(target_temp) )
+    except AttributeError: # option not available for this model
+        print("Cannot set temperature on this device, skipping")
 
     spec.integration_time_micros(int(args.integration_time * 1000))
 
